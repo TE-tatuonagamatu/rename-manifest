@@ -10,6 +10,16 @@ import (
 	"strings"
 )
 
+func replaceLongName(line string) string {
+	sa := strings.Split(line, " ")
+	for i := range sa {
+		if strings.HasPrefix(sa[i], "name=") && len(sa[i]) > 100-len(`name=""`) {
+			sa[i] = `name="sheep/android/platform/external/chromium_org/third_party/eyesfree/braille"`
+		}
+	}
+	return strings.Join(sa, " ")
+}
+
 func replaceFetchName(line string) string {
 	sa := strings.Split(line, " ")
 	for i := range sa {
@@ -49,7 +59,7 @@ func renameManifest(dirpath string, finfo os.FileInfo) error {
 
 	scanner := bufio.NewScanner(src)
 	for scanner.Scan() {
-		dst.WriteString(replaceFetchName(replaceRepoName(scanner.Text())))
+		dst.WriteString(replaceFetchName(replaceRepoName(replaceLongName(scanner.Text()))))
 		dst.WriteString("\n")
 	}
 	if err := scanner.Err(); err != nil {
