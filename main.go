@@ -35,21 +35,21 @@ func tmpName(dirpath string, filename string, suffix string) string {
 }
 
 func renameManifest(dirpath string, finfo os.FileInfo) error {
-	f, err := os.Open(filepath.Join(dirpath, finfo.Name()))
+	src, err := os.Open(filepath.Join(dirpath, finfo.Name()))
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer src.Close()
 
 	dst, err := os.OpenFile(tmpName(dirpath, finfo.Name(), ".xx"), os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
+	defer dst.Close()
 
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(src)
 	for scanner.Scan() {
-		line := replaceFetchName(replaceRepoName(scanner.Text()))
-		dst.WriteString(line)
+		dst.WriteString(replaceFetchName(replaceRepoName(scanner.Text())))
 		dst.WriteString("\n")
 	}
 	if err := scanner.Err(); err != nil {
