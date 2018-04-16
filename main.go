@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,8 +14,12 @@ import (
 func replaceLongName(line string) string {
 	sa := strings.Split(line, " ")
 	for i := range sa {
-		if strings.HasPrefix(sa[i], "name=") && len(sa[i]) > 100-len(`name=""`) {
-			sa[i] = `name="sheep/android/platform/external/chromium_org/third_party/eyesfree/braille"`
+		if strings.HasPrefix(sa[i], "name=") && len(sa[i]) > 100+7 {
+			if strings.Contains(sa[i], `src/android/java/src/com/googlecode/eyesfree`) {
+				sa[i] = strings.Replace(sa[i], `src/android/java/src/com/googlecode/eyesfree`, ``, -1)
+			} else {
+				panic(fmt.Errorf("ERROR: Long repository name: %d: %s", len(sa[i]), sa[i]))
+			}
 		}
 	}
 	return strings.Join(sa, " ")
